@@ -1,4 +1,47 @@
 package com.example.k5_iot_springboot.entity;
 
-public class I_Product {
+
+import com.example.k5_iot_springboot.entity.base.BaseTimeEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+@Entity
+@Table( name = "products",
+        indexes = {@Index(name = "idx_products_name", columnList = "name")},
+        uniqueConstraints = {@UniqueConstraint(name = "uq_products_name", columnNames = "name")})
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class I_Product extends BaseTimeEntity {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank @Size(max = 100)
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @NotNull
+    @Column(nullable = false)
+    private int price;
+
+
+    // 사용자 편의 메서드
+    @Builder
+    private I_Product(String name, int price) {
+        this.name = name;
+        this.price = price;
+    }
+
+
+    // 그냥 @Setter하면 안됨? -> ID까지 Setter가 되어버리면 안되니까 딱 필요한거만 씀
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
 }
