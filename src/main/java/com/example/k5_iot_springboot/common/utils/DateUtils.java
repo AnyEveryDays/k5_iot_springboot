@@ -34,11 +34,20 @@ public class DateUtils {
     // : 프론트에서 타임존이 필요한 경우 유용
     public static String toUtcString(LocalDateTime utcLocalDateTime) {
         if (utcLocalDateTime == null) return null;
-
         // UTC로 해석한 수, Offset을 명시(+00:00)하여 문자열 생성
         OffsetDateTime odt = utcLocalDateTime.atOffset(ZoneOffset.UTC);
-
         return ISO_UTC.format(odt);
+    }
+
+    // KST(LocalDateTime) >>> UTC(LocalDateTime) 변환
+    // KST 2025-09-03
+    public static LocalDateTime kstToUtc(LocalDateTime kstDateTime){
+        if (kstDateTime == null) return null;
+        return kstDateTime.atZone(ZONE_KST) // 서버간 동기화
+                .withZoneSameInstant(ZoneOffset.UTC)
+                .toLocalDateTime();
+        // 입력 받을 때 KST >>> UTC. 변환 (서버 저장용)
+        // 보여줄 때 : UTC >>> KST 변환 (사용자 화면용)
     }
 
 }

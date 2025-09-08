@@ -12,7 +12,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface I_StockRepository extends JpaRepository<I_Stock, Long> {
+public interface I_StockRepository extends JpaRepository<I_Stock, Long> { //탸입을 제네릭으로
+
     // === 락킹 기법 (Locking) ===
     // 1. 락킹
     // : DB에서 동시에 여러 트랜잭션이 같은 데이터를 접근할 때 데이터의 정합성 (일관성)을 보장하기 위해 사용하는 방법

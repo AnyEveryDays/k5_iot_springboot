@@ -147,7 +147,7 @@ create table if not exists user_roles (
   select * from user_roles;
   
   # 샘플 데이터 #
---   insert into user_roles(user_id, role) values (1, "ADMIN");
+insert into user_roles(user_id, role) values (1, "ADMIN");
 --   insert into user_roles(user_id, role) values (2, "USER");
 
 
