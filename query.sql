@@ -10,7 +10,6 @@ create database if not exists k5_iot_springboot
 # 3. 스키마 선택
 use k5_iot_springboot;
 
-
 # 0811(A_Test)
 Create table if not exists test(
 	test_id bigint primary key auto_increment,
@@ -127,8 +126,62 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 SELECT * FROM users;
 
+# 0910 (G_role)
+-- 권한 코드 테이블
+
+CREATE TABLE IF NOT EXISTS `roles`(
+	role_name VARCHAR(30) PRIMARY KEY
+)ENGINE=InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = '사용자 권한';
+
+# 0910 (G_UserRoleId)
+-- 사용자 권한 매핑 (조인 엔티티)
+DROP TABLE IF EXISTS `user_roles`; # (기존의 user_roles 제거:
+CREATE TABLE IF NOT EXISTS `user_roles`(
+	user_id BIGINT NOT NULL,
+    role_name VARCHAR(30) NOT NULL,
+    PRIMARY KEY (user_id, role_name),
+    CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_user_roles_role FOREIGN KEY (role_name) REFERENCES roles(role_name)
+)ENGINE=InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT = '사용자 권한 매핑';
+ 
+
+  ## 권한 데이터 삽입 ##
+  INSERT INTO roles (role_name) VALUES
+	('USER'),
+    ('MANAGER'),
+    ('ADMIN')
+    # 이미 값이 있는 경우(DUPLICATE, 중복)
+    # , 에러 대신 그대로 유지할 것을 설정
+    ON DUPLICATE KEY UPDATE role_name = VALUES(role_name);
+
+SELECT * FROM users;
+
+## users에 값이 없는데 지금 user_id랑 role_name을 넣겠다고 하니 값이 번호에 권한을 줘야하는데, 없어서
+## user 테이블에 값을 생성하고 -> role_name을 부여해야한다
+## 사용자 권한 매핑 삽입 ##
+INSERT INTO user_roles (user_id, role_name) VALUES
+	(1, 'USER'),
+    (2, 'USER'),
+    (2, 'MANAGER'),
+    (3, 'MANAGER'),
+    (3, 'ADMIN')
+    ON DUPLICATE KEY UPDATE role_name = VALUES(role_name);
+
+SELECT * FROM roles;
+
+SELECT * FROM users;
+
+##### 사용하지 않음 #####
+# : 위의 사용자-권한 다대다 형식 사용 권장
 #0827(G_User_role)
 -- 사용자 권한 테이블  
+
 create table if not exists user_roles (
 	user_id bigint not null,
     role varchar(30) not null,
@@ -147,7 +200,7 @@ create table if not exists user_roles (
   select * from user_roles;
   
   # 샘플 데이터 #
-insert into user_roles(user_id, role) values (1, "ADMIN");
+  insert into user_roles(user_id, role) values (1, "ADMIN");
 --   insert into user_roles(user_id, role) values (2, "USER");
 
 
@@ -160,7 +213,7 @@ create table if not exists articles (
     author_id bigint not null,
     created_at datetime(6) not null,
     updated_at datetime(6) not null,
-    
+     
     primary key (id),
     constraint fk_articles_author
 		foreign key (author_id) references users(id) on delete cascade
